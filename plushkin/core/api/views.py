@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django_filters import rest_framework as filters
 from rest_framework import generics, viewsets
 
 from core.api.serializers import UserSerializer, BookmarkSerializer, BookmarkLinkSerializer
@@ -19,6 +20,11 @@ class UserViewSet(viewsets.ModelViewSet):
 class BookmarkViewSet(viewsets.ModelViewSet):
     serializer_class = BookmarkSerializer
     queryset = Bookmark.objects.all()
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_fields = ('type', )
+
+    def get_queryset(self):
+        return self.request.user.bookmarks.all()
 
 
 class BookmarkLinkViewSet(viewsets.ModelViewSet):
