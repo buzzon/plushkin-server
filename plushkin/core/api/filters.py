@@ -1,11 +1,21 @@
-from django_filters import rest_framework as filters
+import django_filters
+from django.db import models
+from django.db.models import Q
 
-from core.api.serializers import BookmarkSerializer
 from core.models import Bookmark
 
 
-# class BookmarkFilter(filters.FilterSet):
-#     queryset = Bookmark.objects.all()
-#     serializer_class = BookmarkSerializer
-#     filter_backends = (filters.DjangoFilterBackend,)
-#     filterset_fields = ('type', 'date')
+class BookmarkFilter(django_filters.FilterSet):
+    search = django_filters.CharFilter(method='my_custom_filter')
+
+    def my_custom_filter(self, queryset, name, value):
+        return Bookmark.objects.filter(
+            Q(title__icontains=value) | Q(siteName__icontains=value)
+        )
+
+    class Meta:
+        model = Bookmark
+        fields = {
+            'type': ['exact'],
+        }
+

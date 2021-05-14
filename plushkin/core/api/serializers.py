@@ -8,13 +8,14 @@ from core.models import Bookmark
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email', 'password', 'first_name']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         user = User(
             email=validated_data['email'],
-            username=validated_data['username']
+            username=validated_data['username'],
+            first_name=validated_data['first_name']
         )
         user.set_password(validated_data['password'])
         user.save()
@@ -31,6 +32,7 @@ class BookmarkSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         bookmark = Bookmark(
             title=validated_data['title'],
+            siteName=validated_data['siteName'],
             url=validated_data['url'],
             type=self.data.get('type', Bookmark._meta.get_field('type').get_default()),
             user=self.context['request'].user,
